@@ -1,0 +1,9 @@
+/build/
+
+#ignore the intensity and color code files
+intensity.txt
+colorCodes.txt
+
+#ignore the images
+/images/
+src/assignment/pkg1/images/
