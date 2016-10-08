@@ -122,6 +122,19 @@ public class readImage {
             ObjectOutputStream outputStream;
             outputStream = new ObjectOutputStream(new FileOutputStream("intensity.txt"));
             outputStream.writeObject(intensityMatrix);
+            
+            int testArray[] = new int[intensityBins.length];
+            for (int i = 0; i < testArray.length; ++i) {
+                testArray[i] = intensityMatrix[0][i];
+            }
+            
+            ObjectInputStream testInput = new ObjectInputStream(new FileInputStream("intensity.txt"));
+            int testMatrix[][] = (int[][])testInput.readObject();
+            
+            for (int i = 0; i < intensityBins.length; ++i) {
+                System.out.println("Written bin and read bin values are: " + testArray[i] + " " + testMatrix[0][i]);
+            }
+            
         } catch (Exception e) {
             System.out.println("Error occurred when writing to file");
         }
