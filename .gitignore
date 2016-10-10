@@ -2,7 +2,7 @@
 
 #ignore the intensity and color code files
 intensity.txt
-colorCodes.txt
+colorCode.txt
 
 #ignore the images
 /images/

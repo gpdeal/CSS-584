@@ -17,8 +17,8 @@ public class readImage {
     int imageCount = 1;
     int intensityBins[] = new int[26];
     int intensityMatrix[][] = new int[100][26];
-    int colorCodeBins[] = new int[64];
-    int colorCodeMatrix[][] = new int[100][64];
+    int colorCodeBins[] = new int[65];
+    int colorCodeMatrix[][] = new int[100][65];
 
     /*Each image is retrieved from the file.  The height and width are found for the image and the getIntensity and
    * getColorCode methods are called.
@@ -41,7 +41,7 @@ public class readImage {
                 int width = image.getWidth();
                 
                 getIntensity(image, height, width);
-                //getColorCode(image, height, width);
+                getColorCode(image, height, width);
             } catch (Exception e) {
                 System.out.println("Error occurred when reading or processing image " + imageCount + ".");
                 //failedReads++;
@@ -53,6 +53,27 @@ public class readImage {
 //        System.out.println("Successful reads: " + successfulReads);
 //        System.out.println("Failed reads: " + failedReads);
         
+
+//        // DEBUG
+//        int iHist[] = intensityMatrix[0];
+//        int imageSize = iHist[0];
+//        int count = 0;
+//        for (int i = 1; i < iHist.length; i++) {
+//            count += iHist[i];
+//        }
+//        System.out.println("Image 1 total pixels: " + imageSize + " image 1 I bin totals: " + count);
+//        
+//        iHist = colorCodeMatrix[0];
+//        imageSize = iHist[0];
+//        count = 0;
+//        for (int i = 1; i < iHist.length; i++) {
+//            count += iHist[i];
+//        }
+//        System.out.println("Image 1 total pixels: " + imageSize + " image 1 CC bin totals: " + count);
+        
+
+
+
         writeIntensity();
         writeColorCode();
 
@@ -64,14 +85,10 @@ public class readImage {
         // save the total number of pixels in the image into the first bin
         intensityBins[0] = height * width;
 
-        for (int y = 0; y < height; ++y) {
-            for (int x = 0; x < width; ++x) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
                 // retrieve RGB values of current pixel
-                int pixel = image.getRGB(x, y);
-                Color color = new Color(pixel);
-                int red = color.getRed();
-                int green = color.getGreen();
-                int blue = color.getBlue();
+                int rgbValues[] = extractRGB(image, x, y);
 
                 // maybe faster, maybe less safe than the Color method above
                 //int red = (pixel & 0x00ff0000) >> 16;
@@ -80,9 +97,9 @@ public class readImage {
                 
                 // calculate intensity value
                 int intensity = (int) (
-                        (0.299 * red)
-                        + (0.587 * green)
-                        + (0.114) * blue
+                        (0.299 * rgbValues[0])    // red
+                        + (0.587 * rgbValues[1])  // green
+                        + (0.114) * rgbValues[2]  // blue
                         );
                 
                 // increment the bin correspinding to the pixel's I-value
@@ -101,45 +118,80 @@ public class readImage {
 
     //color code method
     public void getColorCode(BufferedImage image, int height, int width) {
-        /////////////////////
-        ///your code///
-        /////////////////
+        // save the total number of pixels in the image into the first bin
+        colorCodeBins[0] = height * width;
+        
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                // retrieve RGB values of current pixel
+                int rgbValues[] = extractRGB(image, x, y);
+                
+                // extract the two most significant bits from each of the RGB
+                // values
+                int colorCodeBits[] = new int[6];
+                colorCodeBits[0] = rgbValues[0] >> 7 & 1;
+                colorCodeBits[1] = rgbValues[0] >> 6 & 1;
+                colorCodeBits[2] = rgbValues[1] >> 7 & 1;
+                colorCodeBits[3] = rgbValues[1] >> 6 & 1;
+                colorCodeBits[4] = rgbValues[2] >> 7 & 1;
+                colorCodeBits[5] = rgbValues[2] >> 6 & 1;
+                
+                // construct color code
+                byte colorCode = 0;
+                for (int i = 0; i < 6; i++) {
+                    colorCode <<= 1;
+                    colorCode |= colorCodeBits[i];
+                }
+                
+                colorCodeBins[colorCode + 1]++;
+            }
+        }
+        
+        // add contents of colorCodeBins to colorCodeMatrix and clear the
+        // contents of colorCodeBins
+        for (int i = 0; i < colorCodeBins.length; ++i) {
+            colorCodeMatrix[imageCount - 1][i] = colorCodeBins[i];
+            colorCodeBins[i] = 0;
+        }
+        
     }
 
-    ///////////////////////////////////////////////
-    //add other functions you think are necessary//
-    ///////////////////////////////////////////////
-    //This method writes the contents of the colorCode matrix to a file named colorCodes.txt.
+    
+    private int[] extractRGB(BufferedImage image, int x, int y) {
+        int rgbValues[] = new int[3];
+        
+        int pixel = image.getRGB(x, y);
+        Color color = new Color(pixel);
+        rgbValues[0] = color.getRed();
+        rgbValues[1] = color.getGreen();
+        rgbValues[2] = color.getBlue();
+        
+        return rgbValues;
+    }
+    
+    
+    //This method writes the contents of the colorCode matrix to a file named colorCode.txt.
     public void writeColorCode() {
-        /////////////////////
-        ///your code///
-        /////////////////
+        writeMatrixFile(colorCodeMatrix, "colorCode.txt");
     }
 
     //This method writes the contents of the intensity matrix to a file called intensity.txt
     public void writeIntensity() {
-        try {
-            ObjectOutputStream outputStream;
-            outputStream = new ObjectOutputStream(new FileOutputStream("intensity.txt"));
-            outputStream.writeObject(intensityMatrix);
-            
-            int testArray[] = new int[intensityBins.length];
-            for (int i = 0; i < testArray.length; ++i) {
-                testArray[i] = intensityMatrix[0][i];
-            }
-            
-            ObjectInputStream testInput = new ObjectInputStream(new FileInputStream("intensity.txt"));
-            int testMatrix[][] = (int[][])testInput.readObject();
-            
-            for (int i = 0; i < intensityBins.length; ++i) {
-                System.out.println("Written bin and read bin values are: " + testArray[i] + " " + testMatrix[0][i]);
-            }
-            
-        } catch (Exception e) {
-            System.out.println("Error occurred when writing to file");
-        }
+        writeMatrixFile(intensityMatrix, "intensity.txt");
     }
 
+    
+    private void writeMatrixFile(int matrix[][], String filename) {
+        try {
+            ObjectOutputStream outputStream;
+            outputStream = new ObjectOutputStream(new FileOutputStream(filename));
+            outputStream.writeObject(matrix);
+        } catch (Exception e) {
+            System.out.println("Error occurred when writing to file " + filename);
+        }
+    }
+    
+    
     public static void main(String[] args) {
         new readImage();
     }
