@@ -7,3 +7,4 @@ colorCode.txt
 #ignore the images
 /images/
 src/assignment/pkg1/images/
+/dist/

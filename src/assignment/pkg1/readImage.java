@@ -32,7 +32,8 @@ public class readImage {
 
                 // Read the next image file
                 File file;
-                file = new File("src\\assignment\\pkg1\\images/" + imageCount + ".jpg");
+                // src\\assignment\\pkg1\\
+                file = new File("images/" + imageCount + ".jpg");
                 BufferedImage image = ImageIO.read(file);
 
                 //successfulReads++;
@@ -48,31 +49,6 @@ public class readImage {
             }
             ++imageCount;
         }
-
-//        // DEBUG
-//        System.out.println("Successful reads: " + successfulReads);
-//        System.out.println("Failed reads: " + failedReads);
-        
-
-//        // DEBUG
-//        int iHist[] = intensityMatrix[0];
-//        int imageSize = iHist[0];
-//        int count = 0;
-//        for (int i = 1; i < iHist.length; i++) {
-//            count += iHist[i];
-//        }
-//        System.out.println("Image 1 total pixels: " + imageSize + " image 1 I bin totals: " + count);
-//        
-//        iHist = colorCodeMatrix[0];
-//        imageSize = iHist[0];
-//        count = 0;
-//        for (int i = 1; i < iHist.length; i++) {
-//            count += iHist[i];
-//        }
-//        System.out.println("Image 1 total pixels: " + imageSize + " image 1 CC bin totals: " + count);
-        
-
-
 
         writeIntensity();
         writeColorCode();

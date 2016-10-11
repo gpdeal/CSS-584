@@ -49,7 +49,6 @@ public class CBIR extends JFrame {
     private JPanel buttonPanel;
     private int[][] intensityMatrix = new int[100][26];
     private int[][] colorCodeMatrix = new int[100][65];
-    private Map<Double, LinkedList<Integer>> map;
     int picNo = 0;
     int imageCount = 1; //keeps up with the number of images displayed since the first page.
     int pageNo = 1;
@@ -145,6 +144,8 @@ public class CBIR extends JFrame {
 
     }
 
+    // Opens the file named by the passed String and reads and returns the 
+    // int[][] matrix stored in that file. 
     private int[][] readMatrixFromFile(String filename) {
         int retrievedMatrix[][] = null;
         try {
@@ -267,52 +268,8 @@ public class CBIR extends JFrame {
     private class intensityHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            double[] distance = new double[101];
-            map = new HashMap<Double, LinkedList<Integer>>();
-            double d = 0;
-            int compareImage = 0;
             int pic = (picNo - 1);
-            int picIntensity = 0;
-            double picSize = imageSize[pic];
-
-            
-            // MY CODE
-            int selectedPicIBins[] = intensityMatrix[pic];
-            int selectedPicSize = selectedPicIBins[0];
-            ButtonDistance distanceArray[] = new ButtonDistance[intensityMatrix.length];
-
-            
-            // for each image in the image set
-            for (int i = 0; i < intensityMatrix.length; i++) {
-                // retrieve the data for the image to compare
-                int compPicIBins[] = intensityMatrix[i];
-                int compPicSize = compPicIBins[0];
-
-                // calculate the Manhattan distance between the two images
-                double mDistance = 0;
-                for (int bin = 1; bin < selectedPicIBins.length; bin++) {
-                    
-                    
-                    double binDistance = Math.abs(
-                            ((double) selectedPicIBins[bin] / (double) selectedPicSize)
-                            - ((double) compPicIBins[bin] / (double) compPicSize)
-                    );
-                    mDistance += binDistance;
-                }
-                
-                // store the calculated distance along with the image number
-                ButtonDistance buttonDistance = new ButtonDistance(i + 1, mDistance);
-                distanceArray[i] = buttonDistance;
-            }
-
-            Arrays.sort(distanceArray);
-            
-            // reorder the buttons and redisplay first page
-            for (int i = 1; i < 101; i++) {
-                buttonOrder[i] = distanceArray[i-1].getButtonNo();
-            }
-            displayFirstPage();
-            
+            displayByDifference(intensityMatrix, pic);
         }
 
     }
@@ -327,19 +284,59 @@ public class CBIR extends JFrame {
     private class colorCodeHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            double[] distance = new double[101];
-            map = new HashMap<Double, LinkedList<Integer>>();
-            double d = 0;
-            int compareImage = 0;
             int pic = (picNo - 1);
-            int picIntensity = 0;
-            double picSize = imageSize[pic];
-            /////////////////////
-            ///your code///
-            /////////////////
+            displayByDifference(colorCodeMatrix, pic);
         }
     }
 
+    // This method accepts as arguments an int[][] matrix holding either the 
+    // intensity histograms or the color code histograms for each image and an
+    // int reperesenting the number of the selected image. It then calculates
+    // the Manhattan distance between the selected image and each other image
+    // using the passed histogram matrix. Once all the distances have been
+    // calculated, the buttons in buttonOrder are sorted from lowest to highest
+    // distance and re-displayed.
+    private void displayByDifference(int[][] imageData, int pic) {
+
+        int selectedPicIBins[] = imageData[pic];
+        int selectedPicSize = selectedPicIBins[0];
+        ButtonDistance distanceArray[] = new ButtonDistance[imageData.length];
+
+        // for each image in the image set
+        for (int i = 0; i < imageData.length; i++) {
+            // retrieve the data for the image to compare
+            int compPicIBins[] = imageData[i];
+            int compPicSize = compPicIBins[0];
+
+            // calculate the Manhattan distance between the two images
+            double mDistance = 0;
+            for (int bin = 1; bin < selectedPicIBins.length; bin++) {
+                double binDistance = Math.abs(
+                        ((double) selectedPicIBins[bin] / (double) selectedPicSize)
+                        - ((double) compPicIBins[bin] / (double) compPicSize)
+                );
+                mDistance += binDistance;
+            }
+
+            // store the calculated distance along with the image number
+            ButtonDistance buttonDistance = new ButtonDistance(i + 1, mDistance);
+            distanceArray[i] = buttonDistance;
+        }
+        // arrange images by distance
+        Arrays.sort(distanceArray);
+
+        // reorder the buttons and redisplay first page
+        for (int i = 1; i < 101; i++) {
+            buttonOrder[i] = distanceArray[i - 1].getButtonNo();
+        }
+
+        imageCount = 1;
+        displayFirstPage();
+    }
+
+    // This class associates a button number with a distance value. It exists so
+    // that images can be sorted by their distance value without losing track of
+    // their assigned number.
     private class ButtonDistance implements Comparable<ButtonDistance> {
 
         private int buttonNo;
@@ -366,6 +363,11 @@ public class CBIR extends JFrame {
             mDistance = distance;
         }
 
+        // This method allows ButtonDistance objects to be compared by distance
+        // values. This method returns -1 if this object's distance is less than
+        // that of the object to which it is being compared, 1 if this object's
+        // distance is greater than that of the object to which it is being
+        // compared, and 0 if they have equal distance values.
         public int compareTo(ButtonDistance other) {
             double comparison = this.mDistance - other.getDistance();
             int returnVal = 0;
@@ -378,4 +380,5 @@ public class CBIR extends JFrame {
             return returnVal;
         }
     }
+
 }
