@@ -24,25 +24,26 @@ public class readImage {
    * getColorCode methods are called.
      */
     public readImage() {
-        int successfulReads = 0;
-        int failedReads = 0;
         while (imageCount < 101) {
 
             try {
 
                 // Read the next image file
                 File file;
-                // src\\assignment\\pkg1\\
+                // src\assignment\pkg1\
                 file = new File("images/" + imageCount + ".jpg");
-                BufferedImage image = ImageIO.read(file);
+                if (file.exists()) {
+                    BufferedImage image = ImageIO.read(file);
 
-                //successfulReads++;
+                    int height = image.getHeight();
+                    int width = image.getWidth();
+
+                    getIntensity(image, height, width);
+                    getColorCode(image, height, width);
+                } else {
+                    System.err.println("File images/" + imageCount + ".jpg does not exist.");
+                }
                 
-                int height = image.getHeight();
-                int width = image.getWidth();
-                
-                getIntensity(image, height, width);
-                getColorCode(image, height, width);
             } catch (Exception e) {
                 System.out.println("Error occurred when reading or processing image " + imageCount + ".");
                 //failedReads++;
@@ -55,22 +56,21 @@ public class readImage {
 
     }
 
-    //intensity method 
+    // This method examines each pixel of the passed image, calculates the 
+    // intensity value of that pixel, determines the histogram bin into which
+    // that value falls, and increments that bin. Once the entire histogram
+    // has been calculated, its values are added to the intensityMatrix.
     public void getIntensity(BufferedImage image, int height, int width) {
 
         // save the total number of pixels in the image into the first bin
         intensityBins[0] = height * width;
-
+        
+        // For each pixel in the image
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 // retrieve RGB values of current pixel
                 int rgbValues[] = extractRGB(image, x, y);
-
-                // maybe faster, maybe less safe than the Color method above
-                //int red = (pixel & 0x00ff0000) >> 16;
-                //int green = (pixel & 0x0000ff00) >> 8;
-                //int blue = pixel & 0x000000ff;
-                
+              
                 // calculate intensity value
                 int intensity = (int) (
                         (0.299 * rgbValues[0])    // red
@@ -92,7 +92,10 @@ public class readImage {
         }
     }
 
-    //color code method
+    // This method examines each pixel of the passed image, calculates the 
+    // color code of that pixel, determines the histogram bin into which
+    // that value falls, and increments that bin. Once the entire histogram
+    // has been calculated, its values are added to the colorCodeMatrix.
     public void getColorCode(BufferedImage image, int height, int width) {
         // save the total number of pixels in the image into the first bin
         colorCodeBins[0] = height * width;
