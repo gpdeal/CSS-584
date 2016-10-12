@@ -1,5 +1,10 @@
-/* Project 1
+/*
+ * Assignment 1
+ * 
+ * Author: Galen Deal
+ * Sample code provided by Dr. Min Chen
  */
+
 package assignment.pkg1;
 
 import java.awt.BorderLayout;
@@ -33,6 +38,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.*;
 
+// This class was initially provided by Dr. Min Chen, and completed by Galen Deal
 public class CBIR extends JFrame {
 
     private JLabel photographLabel = new JLabel();  //container to hold a large 
@@ -53,6 +59,7 @@ public class CBIR extends JFrame {
     int imageCount = 1; //keeps up with the number of images displayed since the first page.
     int pageNo = 1;
 
+    // This method was written by Dr. Chen as part of the provided sample code.
     public static void main(String args[]) {
 
         readImage ri = new readImage();
@@ -65,6 +72,7 @@ public class CBIR extends JFrame {
         });
     }
 
+    // This method was written by Dr. Chen as part of the provided sample code.
     public CBIR() {
         //The following lines set up the interface including the layout of the buttons and JPanels.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,6 +140,8 @@ public class CBIR extends JFrame {
     /*This method opens the intensity text file containing the intensity matrix with the histogram bin values for each image.
      * The contents of the matrix are processed and stored in a two dimensional array called intensityMatrix.
      */
+    // This method was originally provided by Dr. Chen as part of the provided 
+    // sample code and was completed by Galen Deal.
     public void readIntensityFile() {
         intensityMatrix = readMatrixFromFile("intensity.txt");
     }
@@ -139,6 +149,8 @@ public class CBIR extends JFrame {
     /*This method opens the color code text file containing the color code matrix with the histogram bin values for each image.
      * The contents of the matrix are processed and stored in a two dimensional array called colorCodeMatrix.
      */
+    // This method was originally provided by Dr. Chen as part of the provided 
+    // sample code and was completed by Galen Deal.
     private void readColorCodeFile() {
         colorCodeMatrix = readMatrixFromFile("colorCode.txt");
 
@@ -168,6 +180,7 @@ public class CBIR extends JFrame {
      * number stored in the buttonOrder array and assigns the value to imageButNo.  The button associated with the image is 
      * then added to panelBottom1.  The for loop continues this process until twenty images are displayed in the panelBottom1
      */
+    // This method was written by Dr. Chen as part of the provided sample code.
     private void displayFirstPage() {
         int imageButNo = 0;
         panelBottom1.removeAll();
@@ -185,6 +198,7 @@ public class CBIR extends JFrame {
     /*This class implements an ActionListener for each iconButton.  When an icon button is clicked, the image on the 
      * the button is added to the photographLabel and the picNo is set to the image number selected and being displayed.
      */
+    // This class was written by Dr. Chen as part of the provided sample code.
     private class IconButtonHandler implements ActionListener {
 
         int pNo = 0;
@@ -207,6 +221,7 @@ public class CBIR extends JFrame {
      * images because there are only 100 images to be displayed.  The first picture on the next page is the image located in 
      * the buttonOrder array at the imageCount
      */
+    // This class was written by Dr. Chen as part of the provided sample code.
     private class nextPageHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
@@ -233,6 +248,7 @@ public class CBIR extends JFrame {
      * images because the starting image is 1.  The first picture on the next page is the image located in 
      * the buttonOrder array at the imageCount
      */
+    // This class was written by Dr. Chen as part of the provided sample code.
     private class previousPageHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
@@ -265,6 +281,8 @@ public class CBIR extends JFrame {
      * compared to all the other image's intensity bin values and a score is determined for how well the images compare.
      * The images are then arranged from most similar to the least.
      */
+    // This class was originally provided by Dr. Chen as part of the provided 
+    // sample code and was completed by Galen Deal.
     private class intensityHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
@@ -281,6 +299,8 @@ public class CBIR extends JFrame {
      * compared to all the other image's intensity bin values and a score is determined for how well the images compare.
      * The images are then arranged from most similar to the least.
      */
+    // This class was originally provided by Dr. Chen as part of the provided 
+    // sample code and was completed by Galen Deal.
     private class colorCodeHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
